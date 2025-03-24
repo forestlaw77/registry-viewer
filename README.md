@@ -19,11 +19,11 @@ You can browse repositories, view tags, and delete them with ease.
 
 ## Installation and setup
 
-This application is uploaded to Docker Hub, so you can run it as a container by executing the following command.
+This application is uploaded to [Docker Hub](https://hub.docker.com/repository/docker/forestlaw/registry-viewer/general), so you can run it as a container by executing the following command.
 
 ```bash
   docker run -d \
-    -e REGISTRY_URL=http://your-registry-url:5000 \
+    -e NEXT_PUBLIC_REGISTRY_URL=http://your-registry-url:5000 \
     -p 8080:8080 \
     --name registry-viewer \
     forestlaw/registry-viewer
@@ -45,8 +45,8 @@ services:
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: "True"
     volumes:
-      - ./workspace/registry:/var/lib/registry
-      - ./config/config.yml:/etc/docker/registry/config.yml
+      - ./registry:/var/lib/registry
+      - ./registry/config.yml:/etc/docker/registry/config.yml
 
   gc:
     image: alpine:latest
@@ -78,6 +78,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 8080
+      NEXT_PUBLIC_REGISTRY_URL: http://your-registry-url:5000
 ```
 
 ```bash
@@ -89,13 +90,24 @@ docker compose up -d
 1. Cloning the repository:
 
 ```bash
-   git clone https://github.com/forestlaw77/docker-registry-viewer.git
+   git clone https://github.com/forestlaw77/registry-viewer.git
 ```
 
-2. Start docker registry, docker registry garbage collector, and docker registry viewer:
+2. build registry-viewer and start:
 
 ```bash
-  cd docker-registry-viewer
+  cd registry-viewer
+  docker buildx build --load =t forestlaw/registry-viewer .
+  docker run -d \
+    -e NEXT_PUBLIC_REGISTRY_URL=http://your-registry-url:5000 \
+    -p 8080:8080 \
+    --name registry-viewer \
+    forestlaw/registry-viewer
+```
+
+Or if you are using docker compose:
+
+```bash
   docker compose build
   docker compose up -d
 ```

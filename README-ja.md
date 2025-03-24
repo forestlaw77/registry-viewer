@@ -26,11 +26,11 @@
 
 ## インストールとセットアップ
 
-このアプリケーションは、Docker Hub にアップしてあるので、次のコマンドを実行してコンテナとして実行できます。
+このアプリケーションは、 [Docker Hub](https://hub.docker.com/repository/docker/forestlaw/registry-viewer/general) にアップしてあるので、次のコマンドを実行してコンテナとして実行できます。
 
 ```bash
   docker run -d \
-    -e REGISTRY_URL=http://your-registry-url:5000 \
+    -e NEXT_PUBLIC_REGISTRY_URL=http://your-registry-url:5000 \
     -p 8080:8080 \
     --name registry-viewer \
     forestlaw/registry-viewer
@@ -52,8 +52,8 @@ services:
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: "True"
     volumes:
-      - ./workspace/registry:/var/lib/registry
-      - ./config/config.yml:/etc/docker/registry/config.yml
+      - ./registry:/var/lib/registry
+      - ./registry/config.yml:/etc/docker/registry/config.yml
 
   gc:
     image: alpine:latest
@@ -85,6 +85,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 8080
+      NEXT_PUBLIC_REGISTRY_URL: http://your-registry-url:5000
 ```
 
 ```bash
@@ -96,16 +97,28 @@ docker compose up -d
 1. リポジトリをクローンします:
 
 ```bash
-   git clone https://github.com/forestlaw77/docker-registry-viewer.git
+   git clone https://github.com/forestlaw77/registry-viewer.git
 ```
 
-2. docker registry と docker registry garbage collector, docker registry viewer を起動します：
+2. registry-viewer をビルドし、起動します：
 
 ```bash
-  cd docker-registry-viewer
+  cd registry-viewer
+  docker buildx build --load -t forestlaw/registry-viewer .
+  docker run -d \
+    -e NEXT_PUBLIC_REGISTRY_URL=http://your-registry-url:5000 \
+    -p 8080:8080 \
+    --name registry-viewer \
+    forestlaw/registry-viewer
+```
+
+または、Docker compose を利用している場合：
+
+```bash
   docker compose build
   docker compose up -d
 ```
+
 
 3. VScode 等で docker registry viewer コンテナに接続して、コード編集します。
 
